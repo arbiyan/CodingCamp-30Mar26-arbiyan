@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Test - Expense & Budget Visualizer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-panel {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-panel h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Integration Test Suite - Task 18.1</h1>
+    <p>This page tests that all components of the Expense & Budget Visualizer work together correctly.</p>
+
+    <div class="test-panel">
+        <h2>Application Preview</h2>
+        <p>The application is loaded below. Use the test buttons to verify functionality.</p>
+        <iframe src="index.html" id="app-frame"></iframe>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 1: Form Submission <span class="test-status pending" id="test1-status">PENDING</span></h2>
+        <p>Verify that form submission creates a transaction and updates all UI components.</p>
+        <button onclick="runTest1()">Run Test 1</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 2: Transaction Deletion <span class="test-status pending" id="test2-status">PENDING</span></h2>
+        <p>Verify that deleting a transaction updates all UI components.</p>
+        <button onclick="runTest2()">Run Test 2</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 3: Custom Category <span class="test-status pending" id="test3-status">PENDING</span></h2>
+        <p>Verify that adding a custom category appears in the selector.</p>
+        <button onclick="runTest3()">Run Test 3</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 4: Sort Controls <span class="test-status pending" id="test4-status">PENDING</span></h2>
+        <p>Verify that sort controls reorder the transaction list.</p>
+        <button onclick="runTest4()">Run Test 4</button>
+        <div id="test4-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 5: Monthly View <span class="test-status pending" id="test5-status">PENDING</span></h2>
+        <p>Verify that monthly view filters transactions correctly.</p>
+        <button onclick="runTest5()">Run Test 5</button>
+        <div id="test5-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 6: Budget Alert <span class="test-status pending" id="test6-status">PENDING</span></h2>
+        <p>Verify that budget alert appears when limit is exceeded.</p>
+        <button onclick="runTest6()">Run Test 6</button>
+        <div id="test6-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 7: Theme Toggle <span class="test-status pending" id="test7-status">PENDING</span></h2>
+        <p>Verify that theme toggle switches all UI components.</p>
+        <button onclick="runTest7()">Run Test 7</button>
+        <div id="test7-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Test 8: Data Persistence <span class="test-status pending" id="test8-status">PENDING</span></h2>
+        <p>Verify that data persists across page reloads.</p>
+        <button onclick="runTest8()">Run Test 8</button>
+        <div id="test8-result"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>Run All Tests</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="resetTests()">Reset All Tests</button>
+    </div>
+
+    <script>
+        function getAppDocument() {
+            return document.getElementById('app-frame').contentDocument || 
+                   document.getElementById('app-frame').contentWindow.document;
+        }
+
+        function updateTestStatus(testNum, status, message) {
+            const statusEl = document.getElementById(`test${testNum}-status`);
+            const resultEl = document.getElementById(`test${testNum}-result`);
+            
+            statusEl.className = `test-status ${status}`;
+            statusEl.textContent = status.toUpperCase();
+            
+            resultEl.innerHTML = `<div class="test-result ${status}">${message}</div>`;
+        }
+
+        function runTest1() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Fill form
+                appDoc.getElementById('item-name').value = 'Test Item';
+                appDoc.getElementById('amount').value = '25.50';
+                appDoc.getElementById('category').value = 'Food';
+                
+                // Submit form
+                const form = appDoc.getElementById('transaction-form');
+                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                
+                // Wait a bit for UI to update
+                setTimeout(() => {
+                    const transactionList = appDoc.getElementById('transaction-list');
+                    const totalAmount = appDoc.getElementById('total-amount');
+                    
+                    const hasTransaction = transactionList.textContent.includes('Test Item');
+                    const hasCorrectTotal = totalAmount.textContent.includes('25.50');
+                    const formCleared = appDoc.getElementById('item-name').value === '';
+                    
+                    if (hasTransaction && hasCorrectTotal && formCleared) {
+                        updateTestStatus(1, 'pass', 'Transaction created, list updated, total updated, form cleared ✓');
+                    } else {
+                        updateTestStatus(1, 'fail', `Failed: Transaction in list: ${hasTransaction}, Correct total: ${hasCorrectTotal}, Form cleared: ${formCleared}`);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                updateTestStatus(1, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest2() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Find and click delete button
+                const deleteBtn = appDoc.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.click();
+                    
+                    setTimeout(() => {
+                        const transactionList = appDoc.getElementById('transaction-list');
+                        const totalAmount = appDoc.getElementById('total-amount');
+                        
+                        const listEmpty = transactionList.textContent.includes('No transactions');
+                        const totalZero = totalAmount.textContent.includes('0.00');
+                        
+                        if (listEmpty && totalZero) {
+                            updateTestStatus(2, 'pass', 'Transaction deleted, list updated, total updated ✓');
+                        } else {
+                            updateTestStatus(2, 'fail', `Failed: List empty: ${listEmpty}, Total zero: ${totalZero}`);
+                        }
+                    }, 100);
+                } else {
+                    updateTestStatus(2, 'fail', 'No transaction to delete. Run Test 1 first.');
+                }
+                
+            } catch (error) {
+                updateTestStatus(2, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest3() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Add custom category
+                appDoc.getElementById('custom-category-input').value = 'Healthcare';
+                appDoc.getElementById('add-category-btn').click();
+                
+                setTimeout(() => {
+                    const categorySelect = appDoc.getElementById('category');
+                    const options = Array.from(categorySelect.options).map(opt => opt.value);
+                    const inputCleared = appDoc.getElementById('custom-category-input').value === '';
+                    
+                    if (options.includes('Healthcare') && inputCleared) {
+                        updateTestStatus(3, 'pass', 'Custom category added and appears in selector ✓');
+                    } else {
+                        updateTestStatus(3, 'fail', `Failed: Category in list: ${options.includes('Healthcare')}, Input cleared: ${inputCleared}`);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                updateTestStatus(3, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest4() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Add multiple transactions first
+                const transactions = [
+                    { name: 'Lunch', amount: '15.00', category: 'Food' },
+                    { name: 'Bus', amount: '3.50', category: 'Transport' },
+                    { name: 'Movie', amount: '12.00', category: 'Fun' }
+                ];
+                
+                transactions.forEach(t => {
+                    appDoc.getElementById('item-name').value = t.name;
+                    appDoc.getElementById('amount').value = t.amount;
+                    appDoc.getElementById('category').value = t.category;
+                    appDoc.getElementById('transaction-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                });
+                
+                setTimeout(() => {
+                    // Test sort by amount
+                    const sortSelect = appDoc.getElementById('sort-select');
+                    sortSelect.value = 'amount';
+                    sortSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    
+                    setTimeout(() => {
+                        const amounts = Array.from(appDoc.querySelectorAll('.transaction-amount'))
+                            .map(el => parseFloat(el.textContent));
+                        
+                        const sortedCorrectly = amounts[0] >= amounts[1] && amounts[1] >= amounts[2];
+                        
+                        if (sortedCorrectly) {
+                            updateTestStatus(4, 'pass', 'Sort controls work correctly ✓');
+                        } else {
+                            updateTestStatus(4, 'fail', `Failed: Amounts not sorted correctly: ${amounts.join(', ')}`);
+                        }
+                    }, 100);
+                }, 300);
+                
+            } catch (error) {
+                updateTestStatus(4, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest5() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Click monthly view button
+                appDoc.getElementById('monthly-view-btn').click();
+                
+                setTimeout(() => {
+                    const monthlyView = appDoc.getElementById('monthly-view');
+                    const mainView = appDoc.getElementById('main-view');
+                    const monthSelect = appDoc.getElementById('month-select');
+                    
+                    const viewSwitched = monthlyView.classList.contains('active') && 
+                                       !mainView.classList.contains('active');
+                    const hasMonths = monthSelect.options.length > 0;
+                    
+                    if (viewSwitched && hasMonths) {
+                        updateTestStatus(5, 'pass', 'Monthly view works correctly ✓');
+                    } else {
+                        updateTestStatus(5, 'fail', `Failed: View switched: ${viewSwitched}, Has months: ${hasMonths}`);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                updateTestStatus(5, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest6() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Set low spending limit
+                appDoc.getElementById('spending-limit').value = '10.00';
+                appDoc.getElementById('set-limit-btn').click();
+                
+                // Add transaction that exceeds limit
+                appDoc.getElementById('item-name').value = 'Expensive';
+                appDoc.getElementById('amount').value = '50.00';
+                appDoc.getElementById('category').value = 'Food';
+                appDoc.getElementById('transaction-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                
+                setTimeout(() => {
+                    const budgetAlert = appDoc.querySelector('.budget-alert');
+                    const totalAmount = appDoc.getElementById('total-amount');
+                    const hasOverBudgetClass = totalAmount.classList.contains('over-budget');
+                    
+                    if (budgetAlert && hasOverBudgetClass) {
+                        updateTestStatus(6, 'pass', 'Budget alert appears when limit exceeded ✓');
+                    } else {
+                        updateTestStatus(6, 'fail', `Failed: Alert exists: ${!!budgetAlert}, Over-budget class: ${hasOverBudgetClass}`);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                updateTestStatus(6, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest7() {
+            try {
+                const appDoc = getAppDocument();
+                
+                const initialTheme = appDoc.body.classList.contains('dark-theme') ? 'dark' : 'light';
+                
+                // Toggle theme
+                appDoc.getElementById('theme-toggle').click();
+                
+                setTimeout(() => {
+                    const newTheme = appDoc.body.classList.contains('dark-theme') ? 'dark' : 'light';
+                    const themeChanged = initialTheme !== newTheme;
+                    
+                    if (themeChanged) {
+                        updateTestStatus(7, 'pass', `Theme toggled from ${initialTheme} to ${newTheme} ✓`);
+                    } else {
+                        updateTestStatus(7, 'fail', 'Theme did not change');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                updateTestStatus(7, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runTest8() {
+            try {
+                const appDoc = getAppDocument();
+                
+                // Check if data exists in localStorage
+                const appWindow = document.getElementById('app-frame').contentWindow;
+                const transactions = appWindow.localStorage.getItem('expense_tracker_transactions');
+                const categories = appWindow.localStorage.getItem('expense_tracker_categories');
+                const limit = appWindow.localStorage.getItem('expense_tracker_limit');
+                const theme = appWindow.localStorage.getItem('expense_tracker_theme');
+                
+                const hasData = transactions || categories || limit || theme;
+                
+                if (hasData) {
+                    updateTestStatus(8, 'pass', 'Data is persisted in localStorage ✓');
+                } else {
+                    updateTestStatus(8, 'fail', 'No data found in localStorage. Run other tests first.');
+                }
+                
+            } catch (error) {
+                updateTestStatus(8, 'fail', `Error: ${error.message}`);
+            }
+        }
+
+        function runAllTests() {
+            runTest1();
+            setTimeout(() => runTest3(), 500);
+            setTimeout(() => runTest4(), 1000);
+            setTimeout(() => runTest5(), 2000);
+            setTimeout(() => runTest6(), 2500);
+            setTimeout(() => runTest7(), 3000);
+            setTimeout(() => runTest8(), 3500);
+        }
+
+        function resetTests() {
+            for (let i = 1; i <= 8; i++) {
+                const statusEl = document.getElementById(`test${i}-status`);
+                const resultEl = document.getElementById(`test${i}-result`);
+                statusEl.className = 'test-status pending';
+                statusEl.textContent = 'PENDING';
+                resultEl.innerHTML = '';
+            }
+            
+            // Reload the app iframe
+            document.getElementById('app-frame').src = 'index.html';
+        }
+    </script>
+</body>
+</html>

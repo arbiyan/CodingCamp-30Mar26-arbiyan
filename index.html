@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Track and visualize your daily expenses with an intuitive interface">
+    <meta name="theme-color" content="#4a90e2">
+    <title>Expense & Budget Visualizer</title>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Expense & Budget Visualizer</h1>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Spending Limit Section -->
+        <section class="spending-limit-section">
+            <div class="limit-input-group">
+                <label for="spending-limit">Monthly Spending Limit:</label>
+                <input type="number" id="spending-limit" placeholder="Enter limit" min="0" step="0.01">
+                <button id="set-limit-btn" class="btn btn-secondary">Set Limit</button>
+            </div>
+        </section>
+
+        <!-- Total Expense Display -->
+        <section class="total-section">
+            <div class="total-display">
+                <h2>Total Expenses</h2>
+                <p class="total-amount" id="total-amount">$0.00</p>
+            </div>
+        </section>
+
+        <!-- Transaction Input Form -->
+        <section class="form-section">
+            <h2>Add Transaction</h2>
+            <form id="transaction-form" class="transaction-form">
+                <div class="form-group">
+                    <label for="item-name">Item Name</label>
+                    <input type="text" id="item-name" name="itemName" placeholder="e.g., Grocery Shopping" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" name="amount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="Food">Food</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Fun">Fun</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Transaction</button>
+                </div>
+                
+                <div id="form-error" class="error-message" role="alert"></div>
+            </form>
+
+            <!-- Custom Category Section -->
+            <div class="custom-category-section">
+                <h3>Add Custom Category</h3>
+                <div class="custom-category-form">
+                    <input type="text" id="custom-category-input" placeholder="Enter category name" maxlength="50">
+                    <button id="add-category-btn" class="btn btn-secondary">Add Category</button>
+                </div>
+                <div id="category-error" class="error-message" role="alert"></div>
+            </div>
+        </section>
+
+        <!-- View Toggle Section -->
+        <section class="view-controls">
+            <button id="main-view-btn" class="btn btn-view active">Main View</button>
+            <button id="monthly-view-btn" class="btn btn-view">Monthly Summary</button>
+        </section>
+
+        <!-- Main View Container -->
+        <div id="main-view" class="view-container active">
+            <!-- Sort Controls -->
+            <section class="sort-section">
+                <label for="sort-select">Sort by:</label>
+                <select id="sort-select" class="sort-select">
+                    <option value="date">Date (Newest First)</option>
+                    <option value="amount">Amount (High to Low)</option>
+                    <option value="category">Category</option>
+                </select>
+            </section>
+
+            <!-- Transaction List -->
+            <section class="transaction-list-section">
+                <h2>Transaction History</h2>
+                <div id="transaction-list" class="transaction-list">
+                    <p class="empty-state">No transactions yet. Add your first expense above!</p>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="chart-section">
+                <h2>Spending by Category</h2>
+                <div class="chart-container">
+                    <canvas id="expense-chart"></canvas>
+                </div>
+                <div id="chart-empty-state" class="empty-state">Add transactions to see your spending visualization</div>
+            </section>
+        </div>
+
+        <!-- Monthly View Container -->
+        <div id="monthly-view" class="view-container">
+            <section class="monthly-summary-section">
+                <h2>Monthly Summary</h2>
+                <div id="month-selector" class="month-selector">
+                    <label for="month-select">Select Month:</label>
+                    <select id="month-select" class="month-select">
+                        <option value="">No months available</option>
+                    </select>
+                </div>
+                <div id="monthly-details" class="monthly-details">
+                    <div class="monthly-total">
+                        <h3>Total for Selected Month</h3>
+                        <p id="monthly-total-amount" class="total-amount">$0.00</p>
+                    </div>
+                    <div id="monthly-transactions" class="transaction-list">
+                        <p class="empty-state">Select a month to view transactions</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Expense & Budget Visualizer. All data stored locally in your browser.</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+</html>
