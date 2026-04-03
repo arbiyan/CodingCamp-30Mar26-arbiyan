@@ -196,7 +196,7 @@ This implementation plan breaks down the expense tracking web application into d
     - **Property 30: Monthly filtering**
     - **Validates: Requirements 8.5**
 
-- [ ] 11. Checkpoint - Ensure all business logic is complete
+- [x] 11. Checkpoint - Ensure all business logic is complete
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 12. Implement chart component
@@ -303,7 +303,7 @@ This implementation plan breaks down the expense tracking web application into d
     - Ensure consistent styling across browsers
     - _Requirements: NFR-1, NFR-3, 11.1, 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 16. Checkpoint - Ensure complete application works end-to-end
+- [x] 16. Checkpoint - Ensure complete application works end-to-end
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 17. Add error handling and edge cases
