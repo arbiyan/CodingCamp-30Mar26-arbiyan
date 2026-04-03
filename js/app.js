@@ -1225,7 +1225,23 @@ class UIController {
     if (view === 'main') {
       this.monthlyViewManager.showMainView();
     } else if (view === 'monthly') {
-      this.monthlyViewManager.showMonthlyView();
+      // Get available months
+      const availableMonths = this.monthlyViewManager.getAvailableMonths();
+      
+      // Auto-select first (most recent) month if available
+      if (availableMonths.length > 0) {
+        const firstMonth = availableMonths[0];
+        this.monthlyViewManager.showMonthlyView(firstMonth.year, firstMonth.month);
+        
+        // Update dropdown to reflect selection
+        const monthSelect = document.getElementById('month-select');
+        if (monthSelect) {
+          monthSelect.value = `${firstMonth.year}-${firstMonth.month}`;
+        }
+      } else {
+        // No months available, show empty state
+        this.monthlyViewManager.showMonthlyView();
+      }
     }
 
     // Update UI
